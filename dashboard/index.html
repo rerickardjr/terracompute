@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TerraCompute - Grid-Aware AI & Microgrid Co-Optimization</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- App Container -->
+  <div class="app-container">
+    
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="brand">
+        <img src="../assets/logo.png" alt="TerraCompute Logo" class="brand-logo" onerror="this.src='https://placehold.co/80x80/121212/06B6D4?text=TC'">
+        <div class="brand-text">
+          <h1>TerraCompute</h1>
+          <p class="subtitle">Autonomous Grid & AI Co-Optimization Engine</p>
+        </div>
+      </div>
+      
+      <!-- System Controls & Global Status -->
+      <div class="header-controls">
+        <div class="system-status active" id="system-status-indicator">
+          <span class="status-dot animate-pulse"></span>
+          <span id="system-status-text">Grid-Balanced Mode</span>
+        </div>
+        <button class="btn btn-primary" id="btn-manual-override">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+          </svg>
+          Trigger Peak VPP Export
+        </button>
+      </div>
+    </header>
+
+    <!-- Key Metrics Ribbon -->
+    <section class="metrics-ribbon">
+      <div class="metric-card">
+        <div class="metric-icon cyan">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"/>
+            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"/>
+            <line x1="6" y1="6" x2="6.01" y2="6"/>
+            <line x1="6" y1="18" x2="6.01" y2="18"/>
+          </svg>
+        </div>
+        <div class="metric-data">
+          <span class="metric-label">Total AI Compute Load</span>
+          <span class="metric-value" id="metric-compute-load">48.2 MW</span>
+          <span class="metric-trend green">↑ 12% Utilization</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon yellow" id="grid-carbon-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18.36 6.64a9 9 0 1 1-12.73 0"/>
+            <line x1="12" y1="2" x2="12" y2="12"/>
+          </svg>
+        </div>
+        <div class="metric-data">
+          <span class="metric-label">Grid Carbon Intensity</span>
+          <span class="metric-value" id="metric-carbon-intensity">342 g/kWh</span>
+          <span class="metric-trend" id="metric-carbon-trend">Moderate Grid Load</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon green">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <div class="metric-data">
+          <span class="metric-label">On-Site Clean Generation</span>
+          <span class="metric-value" id="metric-onsite-gen">70.0 MW</span>
+          <span class="metric-trend green">100% Zero-Carbon</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon blue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+          </svg>
+        </div>
+        <div class="metric-data">
+          <span class="metric-label">Municipal Water Draw</span>
+          <span class="metric-value" id="metric-water-draw">0.0 Gal</span>
+          <span class="metric-trend green">Closed-Loop Cooling</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon shield">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <div class="metric-data">
+          <span class="metric-label">Ratepayer Protection</span>
+          <span class="metric-value" id="metric-ratepayer-shield">100% Secure</span>
+          <span class="metric-trend green">Non-Socialized Tariff</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Grid Dashboard Section -->
+    <main class="dashboard-grid">
+      
+      <!-- Panel 1: AI Workload Orchestration (Green Kubernetes) -->
+      <section class="dashboard-panel panel-orchestration">
+        <div class="panel-header">
+          <div class="panel-title">
+            <svg class="panel-icon cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l-7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+              <line x1="12" y1="22.08" x2="12" y2="12"/>
+            </svg>
+            <h2>AI Workload Orchestrator</h2>
+          </div>
+          <span class="badge badge-cyan" id="orchestrator-perf-badge">98.5% Compute Efficiency</span>
+        </div>
+        
+        <div class="chart-container">
+          <canvas id="chart-carbon-workload"></canvas>
+        </div>
+
+        <div class="workload-queue">
+          <h3>Active AI Training Pipelines</h3>
+          <div class="queue-list" id="queue-list-container">
+            <!-- Dynamically populated via app.js -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel 2: Microgrid Energy Flow & Virtual Power Plant -->
+      <section class="dashboard-panel panel-microgrid">
+        <div class="panel-header">
+          <div class="panel-title">
+            <svg class="panel-icon green" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+            </svg>
+            <h2>Microgrid Power Allocation & VPP Dispatcher</h2>
+          </div>
+          <span class="badge badge-green" id="microgrid-vpp-badge">Zero Net Draw</span>
+        </div>
+
+        <!-- Flow Visualizer Block -->
+        <div class="power-flow-visualizer">
+          <!-- Flow Labels & Nodes -->
+          <div class="flow-node generation">
+            <span class="node-title">Generation</span>
+            <div class="sub-nodes">
+              <div class="sub-node">
+                <span class="sub-name">SMR (Nuclear)</span>
+                <span class="sub-val" id="val-smr">50.0 MW</span>
+              </div>
+              <div class="sub-node">
+                <span class="sub-name">Deep Geothermal</span>
+                <span class="sub-val" id="val-geothermal">20.0 MW</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="flow-arrows">
+            <div class="flow-lane lane-datacenter active-flow">
+              <span class="flow-label">DC Load</span>
+              <div class="arrow-wrapper">
+                <div class="flow-arrow-line"></div>
+              </div>
+            </div>
+            <div class="flow-lane lane-battery" id="flow-lane-battery">
+              <span class="flow-label" id="label-battery">Charging</span>
+              <div class="arrow-wrapper">
+                <div class="flow-arrow-line"></div>
+              </div>
+            </div>
+            <div class="flow-lane lane-grid" id="flow-lane-grid">
+              <span class="flow-label" id="label-grid">VPP Exporting</span>
+              <div class="arrow-wrapper">
+                <div class="flow-arrow-line"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flow-destinations">
+            <div class="dest-node datacenter">
+              <span class="dest-title">Data Center Load</span>
+              <span class="dest-val" id="val-datacenter-load">48.2 MW</span>
+            </div>
+            <div class="dest-node battery">
+              <span class="dest-title">BESS (Battery Storage)</span>
+              <span class="dest-val" id="val-battery">15.8 MW</span>
+            </div>
+            <div class="dest-node external-grid">
+              <span class="dest-title">Public Utility Grid</span>
+              <span class="dest-val text-green" id="val-external-grid">+6.0 MW</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="microgrid-stats">
+          <div class="stat-row">
+            <span>On-Site Baseload Output</span>
+            <strong id="stat-baseload-output">70.0 MW</strong>
+          </div>
+          <div class="stat-row">
+            <span>Battery Charge Level</span>
+            <div class="progress-bar-container">
+              <div class="progress-bar" id="battery-progress" style="width: 74%;"></div>
+            </div>
+            <strong id="stat-battery-percent">74%</strong>
+          </div>
+          <div class="stat-row">
+            <span>Grid Support Dispatch</span>
+            <strong id="stat-grid-export">+6.0 MW (Active)</strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel 3: Public Community Telemetry & Education -->
+      <section class="dashboard-panel panel-community">
+        <div class="panel-header">
+          <div class="panel-title">
+            <svg class="panel-icon shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            <h2>Public Community Telemetry</h2>
+          </div>
+          <span class="badge badge-shield">Verified Independent Audit</span>
+        </div>
+
+        <div class="community-intro">
+          <p>Real-time, unalterable physics dashboard showing environmental and economic impact of TerraCompute on local infrastructure and residential ratepayers.</p>
+        </div>
+
+        <div class="fact-cards">
+          
+          <!-- Fact 1: Water Draw -->
+          <div class="fact-card">
+            <div class="fact-status green-glow">✓ Zero municipal water consumed</div>
+            <h3>Closed-Loop Dry Sinking</h3>
+            <p>Our cooling loop operates with zero evaporative loss. We draw <strong>0 gallons</strong> of municipal fresh water, leaving local agricultural reservoirs untouched.</p>
+            <div class="fact-comparison">
+              <span>Traditional Facility: 2,400,000 Gallons/Day</span>
+              <div class="comp-bar traditional" style="width: 100%;"></div>
+              <span>TerraCompute Siting: 0 Gallons/Day</span>
+              <div class="comp-bar terracompute" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <!-- Fact 2: Ratepayer Shield -->
+          <div class="fact-card">
+            <div class="fact-status green-glow">✓ Grid Upgrades 100% Developer Funded</div>
+            <h3>Ratepayer Bill Protection</h3>
+            <p>Under the specialized <strong>Non-Socialized Interconnection Tariff</strong>, we pay for 100% of our grid substation lines. <strong>Residential ratepayers will see $0.00 added to their bills.</strong></p>
+            <div class="tariff-status-badge">
+              <span class="active-stamp">Approved Tariff Status: ACTIVE</span>
+            </div>
+          </div>
+
+          <!-- Fact 3: Grid Support -->
+          <div class="fact-card">
+            <div class="fact-status green-glow" id="community-offset-glow">✓ Stabilizing Local Grid</div>
+            <h3>Peak Grid Support Offset</h3>
+            <p>During utility peaks, we export clean power from our behind-the-meter generation. Today, we have exported <strong id="stat-total-export-today">32.4 MWh</strong> back to the town, avoiding blackouts and peak pricing.</p>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>&copy; 2026 TerraCompute Corp. All telemetry is audited by independent third-party grid safety systems.</p>
+      <p class="tech-tag">Powered by Outfit & Fira Code Font Engine | Vanilla JS & CSS</p>
+    </footer>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
